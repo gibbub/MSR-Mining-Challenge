@@ -13,22 +13,51 @@ commits = db["commit"]
 commit_changes = db["commit_changes"]
 refactorings = db["refactoring"]
 
-# Simple Tests
-x = commits.find_one()
-print(x)
 
 y = commits.find({}, {'message': 1})    # Finds commits with messages & prints them
 # for data in y: print(data)
 
-#substring = "bug"
-count = 0
-count2 = 0
+
+bug_count = 0
+debug_count = 0
+refactor_count = 0
+total = 0
+
+bug_commits = []
+debug_commits = []
+
 for data in y:
-    count2 += 1
+    total += 1
     message = data['message']
     if "bug" in message or "Bug" in message or "BUG" in message:
-        print(message)
-        count += 1
+        bug_commits.append(message)
+        bug_count += 1
+    if "debug" in message:
+        debug_commits.append(message)
+        debug_count += 1
+    if "refactor" in message or "Refactor" in message:
+        refactor_count += 1
 
-print(count)
-print(count2)
+
+print(f"bugs:  {bug_count}")
+print(f"Size of bugs: {len(bug_commits)}")
+print(f"debugs: {debug_count}")
+print(f"Size of debugs: {len(debug_commits)}")
+print(f"total commits: {total}")
+
+
+refactor_debug_count = 0
+refactor_bug_count = 0
+
+for message in debug_commits:
+    if "refactor" in message or "Refactor" in message:
+        refactor_debug_count += 1
+
+for message in bug_commits:
+    if "refactor" in message or "Refactor" in message:
+        refactor_bug_count += 1
+
+print(f"Refactoring count: {refactor_count}")
+print(f"Refactorings & debugs: {refactor_debug_count}")
+print(f"Refactorings & bugs: {refactor_bug_count}")
+
