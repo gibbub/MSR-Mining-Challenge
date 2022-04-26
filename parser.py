@@ -38,12 +38,14 @@ for data in y:
     if "refactor" in message or "Refactor" in message:
         refactor_count += 1
 
-
-print(f"bugs:  {bug_count}")
-print(f"Size of bugs: {len(bug_commits)}")
-print(f"debugs: {debug_count}")
+print("---- Instances of 'bug' and 'debug' ----")
+print(f" Total commits: {total}")
+print(f"          Bugs: {bug_count}")
+print(f"  Size of bugs: {len(bug_commits)}")
+print(f"        Debugs: {debug_count}")
 print(f"Size of debugs: {len(debug_commits)}")
-print(f"total commits: {total}")
+print("")
+
 
 
 refactor_debug_count = 0
@@ -57,7 +59,8 @@ for message in bug_commits:
     if "refactor" in message or "Refactor" in message:
         refactor_bug_count += 1
 
-print(f"Refactoring count: {refactor_count}")
-print(f"Refactorings & debugs: {refactor_debug_count}")
-print(f"Refactorings & bugs: {refactor_bug_count}")
+print("---- Instances of 'refactor' alone, with bugs, and with debugs ----")
+print(f"   Refactoring count:   {refactor_count}")
+print(f"Refactoring & debugs:   {refactor_debug_count}")
+print(f" Refactorings & bugs:   {refactor_bug_count}")
 
