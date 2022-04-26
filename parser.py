@@ -17,7 +17,18 @@ refactorings = db["refactoring"]
 x = commits.find_one()
 print(x)
 
-x = commits.find({}, {'message': 1})    # Finds commits with messages & prints them
-# for data in x:
-    # print(data)
+y = commits.find({}, {'message': 1})    # Finds commits with messages & prints them
+# for data in y: print(data)
 
+#substring = "bug"
+count = 0
+count2 = 0
+for data in y:
+    count2 += 1
+    message = data['message']
+    if "bug" in message or "Bug" in message or "BUG" in message:
+        print(message)
+        count += 1
+
+print(count)
+print(count2)
