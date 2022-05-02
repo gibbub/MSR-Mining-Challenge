@@ -15,7 +15,7 @@ commits = db["commit"]
 # ~~~~~~~~~~
 # Analyses
 # ~~~~~~~~~~
-all_commits = commits.find({}, {'message': 1,'vcs_system_id': 1})  # Finds commits with messages & prints them
+all_commits = commits.find({}, {'message': 1, 'vcs_system_id': 1})  # Finds commits with messages & prints them
 
 bug_count = 0
 bugfix_count = 0
@@ -34,7 +34,8 @@ for data in all_commits:
     if "bug" in message or "Bug" in message or "BUG" in message:
         bug_commits.append(message)
         bug_count += 1
-    if ("bug" in message or "Bug" in message or "BUG" in message) and ("fix" in message or "Fix" in message or "FIX" in message):
+    if ("bug" in message or "Bug" in message or "BUG" in message) and (
+            "fix" in message or "Fix" in message or "FIX" in message):
         bugfix_commits.append(message)
         bugfix_count += 1
     if "debug" in message or "Debug" in message or "DEBUG" in message:
@@ -42,7 +43,6 @@ for data in all_commits:
         debug_count += 1
     if "refactor" in message or "Refactor" in message or "REFACTOR" in message:
         refactor_count += 1
-
 
 refactor_bug_count = 0
 refactor_debug_count = 0
@@ -60,7 +60,6 @@ for message in bugfix_commits:
 for message in debug_commits:
     if "refactor" in message or "Refactor" in message or "REFACTOR" in message:
         refactor_debug_count += 1
-
 
 print("---- Instances of 'bug', 'bug fix, and 'debug' ----")
 print(f"     Total commits: {total}")
@@ -80,11 +79,14 @@ print("---- Percentages ----")
 print(f"{round((refactor_bug_count / bug_count) * 100, 2)}% of commits containing 'bug' also contain 'refactor'")
 print(f"{round((refactor_bug_count / refactor_count) * 100, 2)}% of commits containing 'refactor' also contain 'bug'\n")
 
-print(f"{round((refactor_bugfix_count / bugfix_count) * 100, 2)}% of commits containing 'bug fix' also contain 'refactor'")
-print(f"{round((refactor_bugfix_count / refactor_count) * 100, 2)}% of commits containing 'refactor' also contain 'bug fix'\n")
+print(
+    f"{round((refactor_bugfix_count / bugfix_count) * 100, 2)}% of commits containing 'bug fix' also contain 'refactor'")
+print(
+    f"{round((refactor_bugfix_count / refactor_count) * 100, 2)}% of commits containing 'refactor' also contain 'bug fix'\n")
 
 print(f"{round((refactor_debug_count / debug_count) * 100, 2)}% of commits containing 'debug' also contain 'refactor'")
-print(f"{round((refactor_debug_count / refactor_count) * 100, 2)}% of commits containing 'refactor' also contain 'debug'\n")
+print(
+    f"{round((refactor_debug_count / refactor_count) * 100, 2)}% of commits containing 'refactor' also contain 'debug'\n")
 
 # Idea: Store different projects (found by ids) and measure how many times
 # bug fixes and refactorings are used in commits
@@ -93,10 +95,10 @@ print(f"{round((refactor_debug_count / refactor_count) * 100, 2)}% of commits co
 ac = commits.find({}, {'message': 1, 'vcs_system_id': 1, 'author_id': 1, 'committer_id': 1, 'parents': 1})
 
 # Dictionary that stores a list of commits for each unique project
-projects_byVCS = {}         # Commits with same version control system ID
-projects_byAuthorID = {}    # Commits with same author ID (person who made commit code)
-projects_byCommitterID = {} # Commits with same committer ID (person who made the commit)
-projects_byParents = {}     # Commits that share the same commit parent(s) --> Actually commits from same project
+projects_byVCS = {}  # Commits with same version control system ID
+projects_byAuthorID = {}  # Commits with same author ID (person who made commit code)
+projects_byCommitterID = {}  # Commits with same committer ID (person who made the commit)
+projects_byParents = {}  # Commits that share the same commit parent(s) --> Actually commits from same project
 
 ac_count = 0
 for data in ac:
@@ -127,13 +129,16 @@ for data in ac:
         projects_byCommitterID[committerID] = [message]
 
     # Parents
+    p_len = len(parents)
+    p_count = 0
     for p in parents:
+        p_count += 1
         if p in projects_byParents:
             projects_byParents[p].append(message)
             break
         else:
-            projects_byParents[p] = [message]
-            break
+            if p_count == p_len:
+                projects_byParents[p] = [message]
 
 print("---- Commits sorted by shared VCSs, author ids, committer ids, and parent commits ----")
 print(f"All commits: {ac_count}")
@@ -142,5 +147,35 @@ print(f"Projects by AuthorID: {len(projects_byAuthorID)}")
 print(f"Projects by Committer ID: {len(projects_byCommitterID)}")
 print(f"Projects by Parent: {len(projects_byParents)}\n")
 
+# Stores info by:
+#  id:   { Total commits: #,
+#         % Refactorings: #,
+#         % 'Bug fix': #,
+#         % 'Debug':   #  }
+info_byParents = {}
 
+for p in projects_byParents:
 
+    total = len(projects_byParents[p])
+    refactorings = 0
+    bugfix = 0
+    debug = 0
+
+    for message in projects_byParents[p]:
+        if 'refactor' in message or 'Refactor' in message or 'REFACTOR' in message:
+            refactorings += 1
+        if ("bug" in message or "Bug" in message or "BUG" in message) and (
+                "fix" in message or "Fix" in message or "FIX" in message):
+            bugfix += 1
+        if "debug" in message or "Debug" in message or "DEBUG" in message:
+            debug += 1
+
+    info_byParents[p] = {"Total commits": total,
+                         "% Refactorings": round((refactorings / total) * 100, 2),
+                         "% 'Bug fix'": round((bugfix / total) * 100, 2),
+                         "% 'Debug'": round((debug / total) * 100, 2)}
+
+for info in info_byParents:
+    print(info_byParents[info]["Total commits"])
+
+print(f"Info by parents: {len(info_byParents)}")
