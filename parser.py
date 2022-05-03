@@ -177,14 +177,19 @@ for id in projects_byCommitterID:
                          "% 'Bug fix'": round((bugfix / total) * 100, 2),
                          "% 'Debug'": round((debug / total) * 100, 2)}
 
+print("==== SPLITTING DATA BASED ON COMMITS WITH SAME COMMITTER IDS ====")
+print("\n---- Splitting on Percent of Refactoring-Related Commits ----")
 print(f"Info by Committer ID: {len(info_byCommitterID)}")
 
 split = 0
+split_bugfix = 0
 for info in info_byCommitterID:
     #print(info_byCommitterID[info]["% Refactorings"])
     split += info_byCommitterID[info]["% Refactorings"]
+    split_bugfix += info_byCommitterID[info]["% 'Bug fix'"]
 
 split = round(split / len(info_byCommitterID))
+split_bugfix = round(split_bugfix / len(info_byCommitterID))
 
 print(f"Split info on: {split}% refactorings")
 
@@ -197,9 +202,8 @@ for info in info_byCommitterID:
     else:
         over_split[info] = info_byCommitterID[info]
 
-print(f"Commits under or equal to split (by committer ID): {len(under_split)}")
-print(f"Commits over split (by committer ID): {len(over_split)}")
-print("\nNow we are going to examine whether projects with more refactorings \nhave more bug fixes, or the other way around")
+print(f"Commits under/equal to refactorings split: {len(under_split)}")
+print(f"Commits over refactorings split: {len(over_split)}")
 
 avg_under_bugfix = 0
 avg_under_debug = 0
@@ -224,3 +228,30 @@ print(f"Average % of commits under split that contain 'debug' : {avg_under_debug
 print(f"Average % of commits over spilt that contain 'bug fix' : {avg_over_bugfix}")
 print(f"Average % of commits over split that contain 'debug' : {avg_over_debug}")
 
+
+print("\n---- Splitting on Percent of Bugfix-Related Commits ----")
+print(f"Split info on: {split_bugfix}% bug fixes")
+
+bugfix_under = {}
+bugfix_over = {}
+for info in info_byCommitterID:
+    if info_byCommitterID[info]["% 'Bug fix'"] <= split_bugfix:
+        bugfix_under[info] = info_byCommitterID[info]
+    else:
+        bugfix_over[info] = info_byCommitterID[info]
+
+print(f"Commits under/equal to bug fix split: {len(bugfix_under)}")
+print(f"Commits over to bug fix split: {len(bugfix_over)}")
+
+avg_under_refactor = 0
+avg_over_refactor = 0
+for x in bugfix_under:
+    avg_under_refactor += bugfix_under[x]["% Refactorings"]
+for y in bugfix_over:
+    avg_over_refactor += bugfix_over[y]["% Refactorings"]
+
+avg_under_refactor = round(avg_under_refactor / len(bugfix_under), 2)
+avg_over_refactor = round(avg_over_refactor / len(bugfix_over), 2)
+
+print(f"Average % of commits under bugfix split that contain 'refactor' : {avg_under_refactor}")
+print(f"Average % of commits over bugfix split that contain 'refactor' : {avg_over_refactor}")
