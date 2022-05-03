@@ -98,7 +98,7 @@ ac = commits.find({}, {'message': 1, 'vcs_system_id': 1, 'author_id': 1, 'commit
 projects_byVCS = {}  # Commits with same version control system ID
 projects_byAuthorID = {}  # Commits with same author ID (person who made commit code)
 projects_byCommitterID = {}  # Commits with same committer ID (person who made the commit)
-projects_byParents = {}  # Commits that share the same commit parent(s) --> Actually commits from same project
+projects_byParents = {}  # Commits that share the same commit parent(s)
 
 ac_count = 0
 for data in ac:
@@ -147,21 +147,23 @@ print(f"Projects by AuthorID: {len(projects_byAuthorID)}")
 print(f"Projects by Committer ID: {len(projects_byCommitterID)}")
 print(f"Projects by Parent: {len(projects_byParents)}\n")
 
+
+# By Committer ID
 # Stores info by:
 #  id:   { Total commits: #,
 #         % Refactorings: #,
 #         % 'Bug fix': #,
 #         % 'Debug':   #  }
-info_byParents = {}
+info_byCommitterID = {}
 
-for p in projects_byParents:
+for id in projects_byCommitterID:
 
-    total = len(projects_byParents[p])
+    total = len(projects_byCommitterID[id])
     refactorings = 0
     bugfix = 0
     debug = 0
 
-    for message in projects_byParents[p]:
+    for message in projects_byCommitterID[id]:
         if 'refactor' in message or 'Refactor' in message or 'REFACTOR' in message:
             refactorings += 1
         if ("bug" in message or "Bug" in message or "BUG" in message) and (
@@ -170,12 +172,55 @@ for p in projects_byParents:
         if "debug" in message or "Debug" in message or "DEBUG" in message:
             debug += 1
 
-    info_byParents[p] = {"Total commits": total,
+    info_byCommitterID[id] = {"Total commits": total,
                          "% Refactorings": round((refactorings / total) * 100, 2),
                          "% 'Bug fix'": round((bugfix / total) * 100, 2),
                          "% 'Debug'": round((debug / total) * 100, 2)}
 
-for info in info_byParents:
-    print(info_byParents[info]["Total commits"])
+print(f"Info by Committer ID: {len(info_byCommitterID)}")
 
-print(f"Info by parents: {len(info_byParents)}")
+split = 0
+for info in info_byCommitterID:
+    #print(info_byCommitterID[info]["% Refactorings"])
+    split += info_byCommitterID[info]["% Refactorings"]
+
+split = round(split / len(info_byCommitterID))
+
+print(f"Split info on: {split}% refactorings")
+
+under_split = {}
+over_split = {}
+
+for info in info_byCommitterID:
+    if info_byCommitterID[info]["% Refactorings"] <= split:
+        under_split[info] = info_byCommitterID[info]
+    else:
+        over_split[info] = info_byCommitterID[info]
+
+print(f"Commits under or equal to split (by committer ID): {len(under_split)}")
+print(f"Commits over split (by committer ID): {len(over_split)}")
+print("\nNow we are going to examine whether projects with more refactorings \nhave more bug fixes, or the other way around")
+
+avg_under_bugfix = 0
+avg_under_debug = 0
+avg_over_bugfix = 0
+avg_over_debug = 0
+
+for x in under_split:
+    avg_under_bugfix += under_split[x]["% 'Bug fix'"]
+    avg_under_debug += under_split[x]["% 'Debug'"]
+
+for y in over_split:
+    avg_over_bugfix += over_split[y]["% 'Bug fix'"]
+    avg_over_debug += over_split[y]["% 'Debug'"]
+
+avg_under_bugfix = round(avg_under_bugfix / len(under_split), 2)
+avg_under_debug = round(avg_under_debug / len(under_split), 2)
+avg_over_bugfix = round(avg_over_bugfix / len(over_split), 2)
+avg_over_debug = round(avg_over_debug / len(over_split), 2)
+
+print(f"Average % of commits under split that contain 'bug fix' : {avg_under_bugfix}")
+print(f"Average % of commits under split that contain 'debug' : {avg_under_debug}")
+print(f"Average % of commits over spilt that contain 'bug fix' : {avg_over_bugfix}")
+print(f"Average % of commits over split that contain 'debug' : {avg_over_debug}")
+
