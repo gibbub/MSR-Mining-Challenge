@@ -38,7 +38,7 @@ totalBugs = 0
 totalRefact = 0
 projectCount = 0
 projects = 0
-i = 0
+
 
 for id in projects_byCommitterID:
     projectCount += 1
@@ -55,11 +55,11 @@ for id in projects_byCommitterID:
                 refactors += 1
                 totalRefact += 1
             nextC = False
-    if bugs > 0 and refactors > 0 and i < 70:
+    if bugs > 0 and refactors > 0:
         print(f"Bug commits: {bugs}")
         print(f"Refactor commits: {refactors}")
         projects += 1
-        i += 1
+
 
 print(f"Total committers: {projectCount}")
 print(f"Total projects: {projects}")
