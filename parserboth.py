@@ -17,8 +17,6 @@ refactorings = db["refactoring"]
 
 y = commits.find({}, {'message': 1, 'committer_id': 1})    # Finds commits with messages & prints them
 
-z = []
-
 
 projects_byCommitterID = {}  # Commits with same committer ID (person who made the commit)
 
@@ -32,6 +30,7 @@ for data in y:
     else:
         projects_byCommitterID[committerID] = [message]
 
+#initializes counters
 totalAll = 0
 projectCount = 0
 commitCount = 0
@@ -40,6 +39,7 @@ for id in projects_byCommitterID:
     all = 0
     projectCount += 1
     for message in projects_byCommitterID[id]:
+        #checks for references to both refactoring and bug fixes
         if "refactor" in message or "Refactor" in message or "REFACTOR" in message or "rearrange" in message or "Rearrange" in message or "REARRANGE" in message or "restructure" in message or "Restructure" in message or "RESTRUCTURE" in message or "streamline" in message or "Streamline" in message or "STREAMLINE" in message or "redesign" in message or "Redesign" in message or "REDESIGN" in message or "alter" in message or "Alter" in message or "ALTER" in message:
             commitCount += 1
             if "bug" in message or "Bug" in message or "BUG" in message or "fix" in message or "Fix" in message or "FIX" in message:
@@ -47,10 +47,12 @@ for id in projects_byCommitterID:
                 all += 1
         elif "bug" in message or "Bug" in message or "BUG" in message or "fix" in message or "Fix" in message or "FIX" in message:
             commitCount += 1
+    #only prints intances where references to both are present
     if all > 0:
         print(f"Both commits: {all}")
         avg += 1
 
+#print total sums
 print(f"Total committers: {projectCount}")
 print(f"Total projects: {avg}")
 print(f"Total commits: {commitCount}")

@@ -17,12 +17,7 @@ refactorings = db["refactoring"]
 
 y = commits.find({}, {'message': 1, 'committer_id': 1})    # Finds commits with messages & prints them
 
-z = []
 
-count = 0
-count2 = 0
-
-projects_byAuthorID = {}  # Commits with same author ID (person who made commit code)
 projects_byCommitterID = {}  # Commits with same committer ID (person who made the commit)
 
 for data in y:
@@ -35,6 +30,7 @@ for data in y:
     else:
         projects_byCommitterID[committerID] = [message]
 
+#initializes counters
 totalBugs = 0
 totalRefact = 0
 projectCount = 0
@@ -46,20 +42,24 @@ for id in projects_byCommitterID:
     refactors = 0
     nextC = False
     for message in projects_byCommitterID[id]:
+        #checks every message for reference to refactoring
         if "refactor" in message or "Refactor" in message or "REFACTOR" in message or "rearrange" in message or "Rearrange" in message or "REARRANGE" in message or "restructure" in message or "Restructure" in message or "RESTRUCTURE" in message or "streamline" in message or "Streamline" in message or "STREAMLINE" in message or "redesign" in message or "Redesign" in message or "REDESIGN" in message or "alter" in message or "Alter" in message or "ALTER" in message:
             refactors += 1
             totalRefact += 1
             nextC = True
+        #checks following commit for references to bug fixing
         elif nextC:
             if "bug" in message or "Bug" in message or "BUG" in message or "fix" in message or "Fix" in message or "FIX" in message:
                 bugs += 1
                 totalBugs += 1
             nextC = False
+    #only prints instances where bug fixes happen after refactoring
     if bugs > 0 and refactors > 0:
         print(f"Refactor commits: {refactors}")
         print(f"Bug commits: {bugs}")
         projects += 1
 
+#prints final sums
 print(f"Total committers: {projectCount}")
 print(f"Total projects: {projects}")
 print(f"Total refactor commits: {totalRefact}")
