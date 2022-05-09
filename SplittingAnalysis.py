@@ -144,23 +144,52 @@ print(f"Average % of commits over split that contain 'debug' : {findAvgDebugs(ov
 
 print("\n*2nd Split -----")
 
+# 4 sections now
 # 2nd Split (Under)
 split2 = findRefactoringSplit(under_split)
 temp2 = splitByRefactoring(split2, under_split)
-under_split2 = temp2[0]
-over_split2 = temp2[1]
+us2 = temp2[0]
+os2 = temp2[1]
 
 # 2nd Split (Over)
 split3 = findRefactoringSplit(over_split)
 temp3 = splitByRefactoring(split3, over_split)
-under_split3 = temp3[0]
-over_split3 = temp3[1]
+us3 = temp3[0]
+os3 = temp3[1]
 
-print(f"Bugfix |----%{findAvgBugFixes(under_split2)}----|<={split2}<|----%{findAvgBugFixes(over_split2)}----||<={split1}<||----%{findAvgBugFixes(under_split3)}----|{split3}|----%{findAvgBugFixes(over_split3)}----|")
+print(f"Bugfix |----%{findAvgBugFixes(us2)}----|<={split2}<|----%{findAvgBugFixes(os2)}----||<={split1}<||----%{findAvgBugFixes(us3)}----|{split3}|----%{findAvgBugFixes(os3)}----|")
+print(f"Sample size: us2 = {len(us2)}; os2 = {len(os2)}; ... us3 = {len(us3)}; os3 = {len(os3)}")
 
 
 print("\n*3rd Split -----")
 
+# 8 sections now
+# 3rd Split (1-Under)
+split4 = findRefactoringSplit(us2)
+temp4 = splitByRefactoring(split4, us2)
+us4 = temp4[0]
+os4 = temp4[1]
+
+# 3rd Split (2-Over)
+split5 = findRefactoringSplit(os2)
+temp5 = splitByRefactoring(split5, os2)
+us5 = temp5[0]
+os5 = temp5[1]
+
+# 3rd Split (3-Under)
+split6 = findRefactoringSplit(us3)
+temp6 = splitByRefactoring(split6, us3)
+us6 = temp6[0]
+os6 = temp6[1]
+
+# 3rd Split (4-Over)
+split7 = findRefactoringSplit(os3)
+temp7 = splitByRefactoring(split7, os3)
+us7 = temp7[0]
+os7 = temp7[1]
+
+print(f"Bugfix |- %{findAvgBugFixes(us4)} -|<={split4}<|- %{findAvgBugFixes(os4)} -|<={split2}<|- %{findAvgBugFixes(us5)} -|<={split5}<|- %{findAvgBugFixes(os5)} -|<={split1}<|- %{findAvgBugFixes(us6)} -|<={split6}<|- %{findAvgBugFixes(os6)} -|<={split3}<|- %{findAvgBugFixes(us7)} -|<={split7}<|- %{findAvgBugFixes(os7)} -|")
+print(f"Sample size: us4 = {len(us4)}; os4 = {len(os4)}; ... us5 = {len(us5)}; os5 = {len(os5)}; ... us6 = {len(us6)}; os6 = {len(os6)}; ... us7 = {len(us7)}; os7 = {len(os7)}")
 
 
 print("\n---- Splitting on Percent of Bugfix-Related Commits ----")
