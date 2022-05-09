@@ -72,6 +72,8 @@ for id in projects_byCommitterID:
 print("---- Splitting on Percent of Refactoring-Related Commits ----")
 print(f"Info by Committer ID: {len(info_byCommitterID)}")
 
+# Find average amount of refactorings per committer
+# @param info: List of commits sorted by committer ID
 def findRefactoringSplit(info):
     split = 0
     for i in info:
@@ -79,7 +81,8 @@ def findRefactoringSplit(info):
     split = round(split / len(info))
     return split
 
-
+# Find average amount of bug fixes per committer
+# @param info: List of commits sorted by committer ID
 def findBugFixSplit(info):
     split = 0
     for i in info:
@@ -88,20 +91,27 @@ def findBugFixSplit(info):
     return split
 
 
+# Splits commits into 2 groups: those <= given split and > given split
+# @param s: Percent to split on
+# @param info: Commits arranged by committer ID
+def splitByRefactoring(s, info):
+    under_split = {}
+    over_split = {}
+    for i in info:
+        if info[i]["% Refactorings"] <= s:
+            under_split[i] = info[i]
+        else:
+            over_split[i] = info[i]
+    return [under_split, over_split]
+
+
 split = findRefactoringSplit(info_byCommitterID)
 split_bugfix = findBugFixSplit(info_byCommitterID)
+s = splitByRefactoring(split, info_byCommitterID)
+under_split = s[0]
+over_split = s[1]
 
 print(f"Split info on: {split}% refactorings")
-
-under_split = {}
-over_split = {}
-
-for info in info_byCommitterID:
-    if info_byCommitterID[info]["% Refactorings"] <= split:
-        under_split[info] = info_byCommitterID[info]
-    else:
-        over_split[info] = info_byCommitterID[info]
-
 print(f"Commits under/equal to refactorings split: {len(under_split)}")
 print(f"Commits over refactorings split: {len(over_split)}")
 
