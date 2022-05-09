@@ -12,11 +12,11 @@ db = client["smartshark_2_2"]
 # Collection Names
 commits = db["commit"]
 
-# Idea: Store different projects (found by ids) and measure how many times
+# Store different projects (found by ids) and measure how many times
 # bug fixes and refactorings are used in commits
 # Does the amount of refactorings go up the more bug fixes there are?
 
-ac = commits.find({}, {'message': 1, 'vcs_system_id': 1, 'author_id': 1, 'committer_id': 1, 'parents': 1})
+ac = commits.find({}, {'message': 1, 'committer_id': 1})
 
 # Dictionary that stores a list of commits for each unique project
 projects_byCommitterID = {}  # Commits with same committer ID (person who made the commit)
@@ -34,21 +34,21 @@ for data in ac:
         projects_byCommitterID[committerID] = [message]
 
 
-print("---- Commits sorted by shared committer ids ----")
+print("---- Pre-Stuff Info ----")
 print(f"All commits: {ac_count}")
-print(f"Projects by Committer ID: {len(projects_byCommitterID)}\n")
+print(f"Projects by Committer ID: {len(projects_byCommitterID)}")
+print(f"Average amount of commits per committer: {round(len(projects_byCommitterID) / ac_count, 2)}\n")
 
 
-# By Committer ID
-# Stores info by:
+# Stores more detailed information about each set of commits
 #  id:   { Total commits: #,
 #         % Refactorings: #,
 #         % 'Bug fix': #,
 #         % 'Debug':   #  }
 info_byCommitterID = {}
 
+# Sort through every commiter & commit message and store associated information
 for id in projects_byCommitterID:
-
     total = len(projects_byCommitterID[id])
     refactorings = 0
     bugfix = 0
@@ -68,19 +68,28 @@ for id in projects_byCommitterID:
                          "% 'Bug fix'": round((bugfix / total) * 100, 2),
                          "% 'Debug'": round((debug / total) * 100, 2)}
 
-print("==== SPLITTING DATA BASED ON COMMITS WITH SAME COMMITTER IDS ====")
-print("\n---- Splitting on Percent of Refactoring-Related Commits ----")
+
+print("---- Splitting on Percent of Refactoring-Related Commits ----")
 print(f"Info by Committer ID: {len(info_byCommitterID)}")
 
-split = 0
-split_bugfix = 0
-for info in info_byCommitterID:
-    #print(info_byCommitterID[info]["% Refactorings"])
-    split += info_byCommitterID[info]["% Refactorings"]
-    split_bugfix += info_byCommitterID[info]["% 'Bug fix'"]
+def findRefactoringSplit(info):
+    split = 0
+    for i in info:
+        split += info[i]["% Refactorings"]
+    split = round(split / len(info))
+    return split
 
-split = round(split / len(info_byCommitterID))
-split_bugfix = round(split_bugfix / len(info_byCommitterID))
+
+def findBugFixSplit(info):
+    split = 0
+    for i in info:
+        split += info[i]["% 'Bug fix'"]
+    split = round(split / len(info))
+    return split
+
+
+split = findRefactoringSplit(info_byCommitterID)
+split_bugfix = findBugFixSplit(info_byCommitterID)
 
 print(f"Split info on: {split}% refactorings")
 
